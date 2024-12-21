@@ -1,6 +1,7 @@
 const axios = require('axios');
 const colors = require('colors');
-const crypto = require("crypto-js");
+const puppeteer = require('puppeteer');
+
 let access_token = "";
 
 // Hàm gọi API /api/home
@@ -23,7 +24,7 @@ async function getHome() {
 
         if (data.status_code === 200) {
             console.log("Fetched home data successfully!".green.bold);
-            // console.log(data.data); // In dữ liệu nếu cần
+            console.log(data); // In dữ liệu nếu cần
             return data.data;
         } else {
             console.log("Failed to fetch home data.".red.bold);
@@ -50,7 +51,7 @@ async function verify() {
 
     const payload = {
         ref_id: null,
-        telegram_data: "query_id=AAFH_ap6AgAAAEf9qnrWRg_y&user=%7B%22id%22%3A6352993607%2C%22first_name%22%3A%22Nam%F0%9F%8D%85%22%2C%22last_name%22%3A%22Tr%E1%BA%A7n%22%2C%22username%22%3A%22TD_NAM%22%2C%22language_code%22%3A%22vi%22%2C%22allows_write_to_pm%22%3Atrue%2C%22photo_url%22%3A%22https%3A%5C%2F%5C%2Ft.me%5C%2Fi%5C%2Fuserpic%5C%2F320%5C%2F3UsY7Jf3O0hAGSEBVtoH3EAdBzWoTwXDIVScknORoaTA_q6PtQu0Ym6udhETRy64.svg%22%7D&auth_date=1734296412&signature=qhu-ORFfVH0FHH6uFGWc_i4_o-yQGs3rS-o5KTqdxqcl7_4WDiB7yMRPn5KJUX0CahoTGlJdm1NxaSqXFmCdAQ&hash=fc1417ba468a3271269a58873c5ad960f3f5b0d909b3237109b5c8f5d39516a5" // Cắt gọn chuỗi dài
+        telegram_data: "query_id=AAFbvtNNAwAAAFu-000JaQQr&user=%7B%22id%22%3A7748173403%2C%22first_name%22%3A%22Nothink28%F0%9F%9B%92%22%2C%22last_name%22%3A%22%22%2C%22username%22%3A%22TD_NAM6%22%2C%22language_code%22%3A%22en%22%2C%22allows_write_to_pm%22%3Atrue%2C%22photo_url%22%3A%22https%3A%5C%2F%5C%2Ft.me%5C%2Fi%5C%2Fuserpic%5C%2F320%5C%2FZfomQscC_r8KU3mIMjLGcjL1UWiCnrLP4Jpu46KYwZaL65JchvU5gqEoPrY6zCMd.svg%22%7D&auth_date=1734763158&signature=y_kt9qnIThb-4bg6f8NR59GDzNVEDFcLfCEbtd6bCnWivu9_U9TTJYq8ybwIUfSV1l1IEmmup-zto-GHpKSJAw&hash=1fcd24f9b692ec7cead601838b19500bf54e2105d785ceb19ca4178de8ae9777" // Cắt gọn chuỗi dài
     };
 
     try {
@@ -85,7 +86,7 @@ async function login() {
         g_recaptcha_response: null,
         mode: null,
         ref_id: null,
-        telegram_data: "query_id=AAFH_ap6AgAAAEf9qnrWRg_y&user=%7B%22id%22%3A6352993607%2C%22first_name%22%3A%22Nam%F0%9F%8D%85%22%2C%22last_name%22%3A%22Tr%E1%BA%A7n%22%2C%22username%22%3A%22TD_NAM%22%2C%22language_code%22%3A%22vi%22%2C%22allows_write_to_pm%22%3Atrue%2C%22photo_url%22%3A%22https%3A%5C%2F%5C%2Ft.me%5C%2Fi%5C%2Fuserpic%5C%2F320%5C%2F3UsY7Jf3O0hAGSEBVtoH3EAdBzWoTwXDIVScknORoaTA_q6PtQu0Ym6udhETRy64.svg%22%7D&auth_date=1734296412&signature=qhu-ORFfVH0FHH6uFGWc_i4_o-yQGs3rS-o5KTqdxqcl7_4WDiB7yMRPn5KJUX0CahoTGlJdm1NxaSqXFmCdAQ&hash=fc1417ba468a3271269a58873c5ad960f3f5b0d909b3237109b5c8f5d39516a5" // Cắt gọn chuỗi dài
+        telegram_data: "query_id=AAFbvtNNAwAAAFu-000JaQQr&user=%7B%22id%22%3A7748173403%2C%22first_name%22%3A%22Nothink28%F0%9F%9B%92%22%2C%22last_name%22%3A%22%22%2C%22username%22%3A%22TD_NAM6%22%2C%22language_code%22%3A%22en%22%2C%22allows_write_to_pm%22%3Atrue%2C%22photo_url%22%3A%22https%3A%5C%2F%5C%2Ft.me%5C%2Fi%5C%2Fuserpic%5C%2F320%5C%2FZfomQscC_r8KU3mIMjLGcjL1UWiCnrLP4Jpu46KYwZaL65JchvU5gqEoPrY6zCMd.svg%22%7D&auth_date=1734763158&signature=y_kt9qnIThb-4bg6f8NR59GDzNVEDFcLfCEbtd6bCnWivu9_U9TTJYq8ybwIUfSV1l1IEmmup-zto-GHpKSJAw&hash=1fcd24f9b692ec7cead601838b19500bf54e2105d785ceb19ca4178de8ae9777" // Cắt gọn chuỗi dài
     };
 
     try {
@@ -133,7 +134,7 @@ async function claimRewards() {
         console.error("Error during claim request:", error.message);
     }
 }
-const puppeteer = require('puppeteer');
+
 async function openURL() {
     const browser = await puppeteer.launch({ headless: true }); // headless: false để thấy trình duyệt
     const page = await browser.newPage();
@@ -149,10 +150,11 @@ async function openURL() {
 
 // Hàm chính
 async function main() {
-    await openURL();
+    // await openURL();
     await verify();
     await login();
-    await claimRewards();
+    // await claimRewards();
+    await getHome();
 }
 
 main();
