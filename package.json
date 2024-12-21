@@ -1,0 +1,22 @@
+{
+  "name": "gumart",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "axios": "^1.7.9",
+    "colors": "^1.4.0",
+    "dotenv": "^16.4.7",
+    "ethers": "^6.13.4",
+    "https-proxy-agent": "^7.0.6",
+    "inquirer": "^12.2.0",
+    "luxon": "^3.5.0",
+    "yargs": "^17.7.2"
+  }
+}
