@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MetaMask Sign In Request</title>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.6.9/dist/ethers.umd.min.js"></script>
+</head>
+<body>
+    <button id="loginBtn">Login with MetaMask</button>
+    <p id="address"></p>
+    <p id="signature"></p>
+
+    <script>
+        // Kiểm tra MetaMask đã cài đặt chưa
+        if (typeof window.ethereum !== 'undefined') {
+            console.log('MetaMask is installed!');
+        } else {
+            console.log('MetaMask is not installed!');
+            alert('Please install MetaMask!');
+        }
+
+        const loginBtn = document.getElementById('loginBtn');
+        const addressDisplay = document.getElementById('address');
+        const signatureDisplay = document.getElementById('signature');
+
+        // Kết nối và yêu cầu đăng nhập
+        loginBtn.addEventListener('click', async () => {
+            try {
+                // Kết nối với MetaMask và lấy provider
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);  // Yêu cầu quyền truy cập tài khoản MetaMask
+
+                const signer = provider.getSigner();
+                const userAddress = await signer.getAddress();
+
+                // Tạo thông điệp yêu cầu đăng nhập
+                const message = `
+                    app.gumart.io wants you to sign in with your Ethereum account:
+                    ${userAddress}
+
+                    URI: https://app.gumart.io
+                    Version: 1
+                    Chain ID: 56
+                    Nonce: jVSTknEzw6Blj2Rpa
+                    Issued At: ${new Date().toISOString()}
+                `;
+
+                // Hiển thị địa chỉ ví và thông điệp
+                addressDisplay.textContent = `Connected Address: ${userAddress}`;
+                console.log('Message to sign:', message);
+
+                // Yêu cầu ký tên thông điệp
+                const signature = await signer.signMessage(message);
+                console.log('Signature:', signature);
+
+                // Hiển thị chữ ký
+                signatureDisplay.textContent = `Signature: ${signature}`;
+
+                // Payload API login
+                const payload = {
+                    message: message,
+                    signature: signature
+                };
+                console.log('Payload for login API:', payload);
+
+            } catch (error) {
+                console.error("Error connecting to MetaMask:", error);
+                alert('Error connecting to MetaMask. Please try again.');
+            }
+        });
+    </script>
+</body>
+</html>

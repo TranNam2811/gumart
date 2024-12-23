@@ -7,6 +7,8 @@ class Gumart {
     constructor(telegram_data) {
         this.tg_data = telegram_data;
         this.access_token = "";
+        this.current_package_name = "";
+        this.boost_next_timestamp = 0;
     }
 
     async verify() {
@@ -66,7 +68,33 @@ class Gumart {
         }
     }
 
-    async claimRewards() {
+    async home() {
+        const url = "https://api.gumart.click/api/home";
+        const headers = {
+            "Authorization": this.access_token,
+            "Origin": "https://d2kpeuq6fthlg5.cloudfront.net",
+            "Accept": "application/json, text/plain, */*",
+        };
+
+        try {
+            const response = await axios.get(url, { headers });
+            const data = response.data;
+
+            if (data.status_code === 200) {
+                console.log("Home load successful! ".green.bold, `<${data.status_code}>`.yellow);
+                this.current_package_name = data.data.current_package_name;
+                this.boost_next_timestamp = data.data.boost_next_timestamp;
+                console.log(this.current_package_name);
+            } else {
+                console.log("Failed to fetch home data.".red.bold);
+                console.log("Message:", data.message);
+            }
+        } catch (error) {
+            console.error("Error during fetching home data:", error.message);
+        }
+    }
+
+    async claim() {
         const url = "https://api.gumart.click/api/claim";
         const headers = {
             "Content-Type": "application/json",
@@ -89,6 +117,40 @@ class Gumart {
         } catch (error) {
             console.error("Error during claim request:", error.message);
         }
+    }
+
+    async boost() {
+        const url = "https://api.gumart.click/api/boost";
+        const headers = {
+            "Content-Type": "application/json",
+            "Authorization": this.access_token,
+            "Origin": "https://d2kpeuq6fthlg5.cloudfront.net",
+            "Accept": "application/json, text/plain, */*",
+        };
+        const remainingTime = this.calculateBoostTime();
+        if (remainingTime <= 0) {
+            try {
+                const response = await axios.post(url,null, { headers });
+                const data = response.data;
+
+                if (data.status_code === 200) {
+                    console.log("Boost successful! ".green.bold);
+                    console.log(data.data);
+                } else {
+                    console.log("Boost failed.".red.bold);
+                    console.log(data);
+                }
+            } catch (error) {
+                console.error("Error during boost request:", error.message);
+            }
+        } else {
+            const { hours, minutes, seconds } = this.formatTime(remainingTime);
+            console.log(
+                `Còn lại ${hours} giờ, ${minutes} phút, ${seconds} giây trước khi có thể 'boost'.`.yellow.bold
+            );
+        }
+
+
     }
 
     deCodeTelegramData() {
@@ -116,7 +178,19 @@ class Gumart {
         }, 200);
         return interval;
     };
-    
+
+    formatTime = (seconds) => {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const secs = seconds % 60;
+        return { hours, minutes, seconds: secs };
+    };
+
+    calculateBoostTime = () => {
+        const currentTimestamp = Math.floor(Date.now() / 1000);
+        return this.boost_next_timestamp - currentTimestamp;
+    }
+
     async processAccount(index) {
         const browser = await puppeteer.launch({ headless: true });
         const page = await browser.newPage();
@@ -124,7 +198,8 @@ class Gumart {
         const encodedQueryString = encodeURIComponent(this.tg_data);
         const url = `${baseUrl}#tgWebAppData=${encodedQueryString}`;
         const account_data = this.deCodeTelegramData();
-        console.log(`========== Tài khoản ${index + 1} | ${account_data.user.username.green.bold} ==========`);
+        const account_number = index;
+        console.log(`========== Tài khoản ${account_number} | ${account_data.user.username.green.bold} ==========`);
         const loadingInterval = this.loadingEffect();
         await page.goto(url);
         await new Promise((resolve) => setTimeout(resolve, 10000));
@@ -133,7 +208,11 @@ class Gumart {
         await browser.close();
         await this.verify();
         await this.login();
-        await this.claimRewards();
+        await this.home();
+        if (this.current_package_name === 'Free Pack') {
+            await this.boost();
+        }
+        await this.claim();
     }
 }
 

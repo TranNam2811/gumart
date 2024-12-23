@@ -1,7 +1,8 @@
 {
   "name": "gumart",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "main.js", 
+  "bin": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -22,5 +23,9 @@
     "qs": "^6.13.1",
     "querystring": "^0.2.1",
     "yargs": "^17.7.2"
+  },
+  "pkg": {
+    "assets": ["data.txt"],
+    "scripts": ["Gumart.js"]
   }
 }

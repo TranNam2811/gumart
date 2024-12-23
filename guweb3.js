@@ -37,6 +37,7 @@ async function initSession() {
 }
 
 async function loginWithSIWE(sessionKey) {
+    console.log(sessionKey);
     const url = "https://api.gumart.click/api/siwe/login";
 
     const headers = {
@@ -47,13 +48,13 @@ async function loginWithSIWE(sessionKey) {
         "siwe-session-key": sessionKey,
     };
     const issuedAt = new Date().toISOString();
-    const message = `app.gumart.io wants you to sign in with your Ethereum account:\n0xb2B3136fd81844471348eD03DBB95Ea6fCf0a7C8\n\n\nURI: https://app.gumart.io\nVersion: 1\nChain ID: 56\nNonce: jVSTknEzw6Blj2Rpa\nIssued At: ${issuedAt}`;
+    const message = `app.gumart.io wants you to sign in with your Ethereum account:\n0xb2B3136fd81844471348eD03DBB95Ea6fCf0a7C8\n\n\nURI: https://app.gumart.io\nVersion: 1\nChain ID: 56\nNonce: jVSTknEzw6Blj2Rpa\nIssued At: 2024-12-22T22:09:02.530Z`;
     console.log(message);
     const signature = await getSignature(message);
 
     const payload = {
         message: message,
-        signature: signature,
+        signature: "0x3384ba1d8472c5a4ec2c5b7fdc5d277e052c4f464158c10d94fd781c6fade07a1037ed73354c3dceb7bf654817ef383817fab024ccec366d88c2d2dbb837f14c1b",
     };
 
     try {
@@ -66,7 +67,6 @@ async function loginWithSIWE(sessionKey) {
 
 async function main() {
     const sessionKey = await initSession();
-    console.log(sessionKey);
     if (sessionKey) {
         await loginWithSIWE(sessionKey);
     }
